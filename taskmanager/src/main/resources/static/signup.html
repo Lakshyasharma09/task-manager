@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Signup</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #2563eb, #1e3a8a);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      width: 300px;
+      color: white;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: white;
+      color: #2563eb;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #e0e7ff;
+    }
+
+    .link {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .error {
+      color: #ffcccc;
+      font-size: 13px;
+      margin-top: 5px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Signup</h2>
+
+  <input id="name" placeholder="Name">
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+
+  <div id="error" class="error"></div>
+
+  <button onclick="signup()">Create Account</button>
+
+  <div class="link">
+    <a href="login.html">Already have account? Login</a>
+  </div>
+</div>
+
+<script>
+const BASE = "http://localhost:8080";
+
+function signup() {
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!name || !email || !password) {
+    showError("All fields are required");
+    return;
+  }
+
+  if (password.length < 4) {
+    showError("Password must be at least 4 characters");
+    return;
+  }
+
+  fetch(BASE + "/auth/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password })
+  })
+  .then(res => {
+    if (!res.ok) {
+      return res.text().then(t => { throw new Error(t); });
+    }
+    return res.json();
+  })
+  .then(() => {
+    window.location.href = "login.html";
+  })
+  .catch(err => {
+    showError(err.message || "Signup failed");
+  });
+}
+
+function showError(msg) {
+  document.getElementById("error").innerText = msg;
+}
+</script>
+
+</body>
+</html>

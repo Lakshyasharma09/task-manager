@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #2563eb, #1e3a8a);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      width: 300px;
+      color: white;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background: white;
+      color: #2563eb;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #e0e7ff;
+    }
+
+    .link {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .link a {
+      color: #c7d2fe;
+      text-decoration: none;
+    }
+
+    .error {
+      color: #ffcccc;
+      font-size: 13px;
+      margin-top: 8px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Login</h2>
+
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+
+  <div id="error" class="error"></div>
+
+  <button onclick="login()">Login</button>
+
+  <div class="link">
+    <a href="signup.html">Don't have an account? Signup</a>
+  </div>
+</div>
+
+<script>
+const BASE = "http://localhost:8080";
+
+function login(){
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if(!email || !password){
+    showError("Enter email and password");
+    return;
+  }
+
+  fetch(BASE + "/auth/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ email, password })
+  })
+  .then(res => {
+    if(!res.ok){
+      return res.text().then(t => { throw new Error(t); });
+    }
+    return res.text();
+  })
+  .then(token => {
+    localStorage.setItem("token", token);
+    window.location.href = "dashboard.html";
+  })
+  .catch(err => {
+    showError(err.message || "Login failed");
+  });
+}
+
+function showError(msg){
+  document.getElementById("error").innerText = msg;
+}
+</script>
+
+</body>
+</html>

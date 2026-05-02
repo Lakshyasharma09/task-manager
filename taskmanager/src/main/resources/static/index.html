@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Task Manager</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #2563eb, #1e3a8a);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .container {
+      text-align: center;
+      background: rgba(255,255,255,0.1);
+      padding: 40px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      width: 320px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 14px;
+      margin-bottom: 25px;
+      opacity: 0.9;
+    }
+
+    a {
+      display: block;
+      margin: 10px 0;
+      padding: 12px;
+      background: white;
+      color: #2563eb;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: 0.25s;
+    }
+
+    a:hover {
+      background: #e0e7ff;
+      transform: scale(1.03);
+    }
+
+    .footer {
+      margin-top: 15px;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Task Manager</h1>
+  <p>Manage your team tasks efficiently</p>
+
+  <a href="signup.html">Create Account</a>
+  <a href="login.html">Login</a>
+
+   
+</div>
+
+</body>
+</html>

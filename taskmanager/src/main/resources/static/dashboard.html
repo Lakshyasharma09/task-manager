@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+
+<style>
+body {
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    display:flex;
+    background:#f4f6f9;
+}
+
+.sidebar {
+    width:220px;
+    background:#1e293b;
+    color:white;
+    height:100vh;
+    padding:20px;
+}
+
+.sidebar h3 {
+    text-align:center;
+}
+
+.sidebar button {
+    width:100%;
+    padding:12px;
+    margin:6px 0;
+    border:none;
+    background:none;
+    color:white;
+    cursor:pointer;
+    border-radius:6px;
+}
+
+.sidebar button:hover {
+    background:#334155;
+}
+
+.main {
+    flex:1;
+    padding:20px;
+}
+
+.card {
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+input {
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border:1px solid #ccc;
+    border-radius:6px;
+}
+
+.action {
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:10px;
+    border-radius:6px;
+    cursor:pointer;
+    width:100%;
+}
+
+.action:hover {
+    background:#1d4ed8;
+}
+
+.item {
+    background:#e2e8f0;
+    padding:8px;
+    margin:5px 0;
+    border-radius:6px;
+}
+
+.stats {
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    gap:15px;
+}
+
+.box {
+    background:white;
+    padding:20px;
+    text-align:center;
+    border-radius:10px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h3>TaskApp</h3>
+  <button onclick="show('users')">Users</button>
+  <button onclick="show('projects')">Projects</button>
+  <button onclick="show('tasks')">Tasks</button>
+  <button onclick="show('dashboard')">Dashboard</button>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="main">
+
+<div id="users">
+  <div class="card">
+    <h3>Create User</h3>
+    <input id="name" placeholder="Name">
+    <input id="email" placeholder="Email">
+    <button class="action" onclick="createUser()">Create</button>
+  </div>
+
+  <div class="card">
+    <h3>Users</h3>
+    <button class="action" onclick="loadUsers()">Load Users</button>
+    <div id="usersList"></div>
+  </div>
+</div>
+
+<div id="projects" style="display:none">
+  <div class="card">
+    <h3>Create Project</h3>
+    <input id="pname" placeholder="Project Name">
+    <button class="action" onclick="createProject()">Create</button>
+  </div>
+
+  <div class="card">
+    <h3>Projects</h3>
+    <button class="action" onclick="loadProjects()">Load Projects</button>
+    <div id="projectsList"></div>
+  </div>
+</div>
+
+<div id="tasks" style="display:none">
+  <div class="card">
+    <h3>Create Task</h3>
+    <input id="title" placeholder="Task Title">
+    <input id="userId" placeholder="User ID">
+    <input id="projectId" placeholder="Project ID">
+    <button class="action" onclick="createTask()">Create</button>
+  </div>
+
+  <div class="card">
+    <h3>Tasks</h3>
+    <button class="action" onclick="loadTasks()">Load Tasks</button>
+    <div id="tasksList"></div>
+  </div>
+</div>
+
+<div id="dashboard" style="display:none">
+  <div class="card">
+    <h3>Dashboard</h3>
+    <button class="action" onclick="loadDashboard()">Load Stats</button>
+
+    <div class="stats">
+      <div class="box"><h4>Total</h4><p id="total"></p></div>
+      <div class="box"><h4>Todo</h4><p id="todo"></p></div>
+      <div class="box"><h4>In Progress</h4><p id="progress"></p></div>
+      <div class="box"><h4>Done</h4><p id="done"></p></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const BASE = "http://localhost:8080";
+const token = localStorage.getItem("token");
+
+if (!token) {
+  alert("Please login first");
+  window.location.href = "login.html";
+}
+
+function getHeaders(){
+  return {
+    "Content-Type":"application/json",
+    "Authorization":"Bearer "+token
+  };
+}
+
+function show(id){
+  document.querySelectorAll(".main > div").forEach(d=>d.style.display="none");
+  document.getElementById(id).style.display="block";
+}
+
+function logout(){
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+}
+
+function createUser(){
+fetch(BASE+"/users",{method:"POST",headers:getHeaders(),
+body:JSON.stringify({
+name: name.value,
+email: email.value
+})})
+.then(()=>loadUsers());
+}
+
+function loadUsers(){
+fetch(BASE+"/users",{headers:getHeaders()})
+.then(r=>r.json())
+.then(data=>{
+usersList.innerHTML="";
+data.forEach(u=>{
+usersList.innerHTML += `<div class="item">ID:${u.id} | ${u.name}</div>`;
+});
+});
+}
+
+function createProject(){
+const userId = prompt("Enter your User ID");
+
+fetch(BASE+"/projects?userId="+userId,{
+method:"POST",
+headers:getHeaders(),
+body:JSON.stringify({
+name: pname.value
+})
+})
+.then(()=>{
+alert("Project created");
+loadProjects();
+});
+}
+
+function loadProjects(){
+fetch(BASE+"/projects",{headers:getHeaders()})
+.then(r=>r.json())
+.then(data=>{
+projectsList.innerHTML="";
+data.forEach(p=>{
+projectsList.innerHTML += `<div class="item">ID:${p.id} | ${p.name}</div>`;
+});
+});
+}
+
+function createTask(){
+	fetch(BASE+"/tasks",{
+	method:"POST",
+	headers:getHeaders(),
+	body:JSON.stringify({
+	title: title.value,
+	assignedTo:{id:Number(userId.value)},
+	project:{id:Number(projectId.value)}
+	})
+	})
+	.then(res=>{
+	  if(!res.ok){
+	    return res.text().then(t=>{ throw new Error(t); });
+	  }
+	  return res.json();
+	})
+	.then(()=>{
+	  alert("Task created");
+	  loadTasks();
+	})
+	.catch(err=>{
+	  alert("Error: "+err.message);
+	});
+	}
+
+function loadTasks(){
+fetch(BASE+"/tasks",{headers:getHeaders()})
+.then(r=>r.json())
+.then(data=>{
+tasksList.innerHTML="";
+data.forEach(t=>{
+tasksList.innerHTML += `<div class="item">${t.title} - ${t.status}</div>`;
+});
+});
+}
+
+function loadDashboard(){
+fetch(BASE+"/dashboard",{headers:getHeaders()})
+.then(r=>r.json())
+.then(d=>{
+total.innerText = d.totalTasks;
+todo.innerText = d.todo;
+progress.innerText = d.inProgress;
+done.innerText = d.done;
+});
+}
+</script>
+
+</body>
+</html>
